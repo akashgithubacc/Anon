@@ -1,23 +1,25 @@
-export const dynamic = "force-dynamic";
-
+import { NextRequest, NextResponse } from "next/server";
 import UserModel from "@/model/User";
 import { getServerSession } from "next-auth/next";
 import dbConnect from "@/lib/dbConnect";
 import { User } from "next-auth";
-import { Message } from "@/model/User";
-import { NextRequest } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
 
+export const dynamic = "force-dynamic";
+
+// ✅ Correct way to extract params in Next.js API Route
 export async function DELETE(
-	request: Request,
-	{ params }: { params: { messageid: string } }
+	request: NextRequest,
+	context: { params: { messageid: string } }
 ) {
-	const messageId = params.messageid;
+	const { messageid } = context.params; // ✅ Use context to get params
 	await dbConnect();
+
 	const session = await getServerSession(authOptions);
 	const _user: User = session?.user;
+
 	if (!session || !_user) {
-		return Response.json(
+		return NextResponse.json(
 			{ success: false, message: "Not authenticated" },
 			{ status: 401 }
 		);
@@ -26,11 +28,11 @@ export async function DELETE(
 	try {
 		const updateResult = await UserModel.updateOne(
 			{ _id: _user._id },
-			{ $pull: { messages: { _id: messageId } } }
+			{ $pull: { messages: { _id: messageid } } }
 		);
 
 		if (updateResult.modifiedCount === 0) {
-			return Response.json(
+			return NextResponse.json(
 				{
 					message: "Message not found or already deleted",
 					success: false,
@@ -39,13 +41,13 @@ export async function DELETE(
 			);
 		}
 
-		return Response.json(
+		return NextResponse.json(
 			{ message: "Message deleted", success: true },
 			{ status: 200 }
 		);
 	} catch (error) {
 		console.error("Error deleting message:", error);
-		return Response.json(
+		return NextResponse.json(
 			{ message: "Error deleting message", success: false },
 			{ status: 500 }
 		);
