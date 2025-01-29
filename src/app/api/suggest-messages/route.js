@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { HfInference } from "@huggingface/inference";
 import { HuggingFaceStream, StreamingTextResponse } from "ai";
 
