@@ -7,12 +7,19 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 
 export const dynamic = "force-dynamic";
 
-// ✅ Correct way to extract params in Next.js API Route
 export async function DELETE(
 	request: NextRequest,
-	context: { params: { messageid: string } }
+	{ params }: { params: { messageid: string } } // ✅ Correct typing
 ) {
-	const { messageid } = context.params; // ✅ Use context to get params
+	const { messageid } = params;
+
+	if (!messageid) {
+		return NextResponse.json(
+			{ success: false, message: "Message ID not provided" },
+			{ status: 400 }
+		);
+	}
+
 	await dbConnect();
 
 	const session = await getServerSession(authOptions);
