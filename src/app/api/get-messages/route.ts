@@ -20,6 +20,8 @@ export async function GET(request: Request) {
 	}
 	const userId = new mongoose.Types.ObjectId(_user._id);
 	try {
+
+		// here messages are fetched using an aggregate function
 		const user = await UserModel.aggregate([
 			{ $match: { _id: userId } },
 			{ $unwind: "$messages" },

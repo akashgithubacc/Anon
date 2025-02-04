@@ -18,6 +18,7 @@ export async function GET(request: Request) {
 			username: searchParams.get("username"),
 		};
 
+		//eliminates white spaces in params
 		const result = UsernameQuerySchema.safeParse(queryParams);
 
 		if (!result.success) {

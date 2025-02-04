@@ -6,6 +6,7 @@ import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/User";
 import { User } from "next-auth";
 
+// this function is to toggle the user's message acceptance status in the database
 export async function POST(request: Request) {
 	// Connect to the database
 	await dbConnect();
@@ -63,6 +64,7 @@ export async function POST(request: Request) {
 	}
 }
 
+// this function is to display the user's message acceptance status before sending the message
 export async function GET(request: Request) {
 	// Connect to the database
 	await dbConnect();

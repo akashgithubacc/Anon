@@ -1,6 +1,10 @@
-import { resend } from "@/lib/resend";
+// /helpers/sendVerificationEmail.ts
+
+import nodemailer from "nodemailer";
+import { emailConfig } from "./emailConfig";
 import VerificationEmail from "../../emails/VerificationEmail";
 import { ApiResponse } from "@/types/ApiResponse";
+import { render } from "@react-email/render";
 
 export async function sendVerificationEmail(
 	email: string,
@@ -8,12 +12,22 @@ export async function sendVerificationEmail(
 	verifyCode: string
 ): Promise<ApiResponse> {
 	try {
-		await resend.emails.send({
-			from: "no-reply@anon.resend.dev",
+		const transporter = nodemailer.createTransport(emailConfig);
+
+		// Use @react-email/render instead of react-dom/server
+		const emailHtml = render(
+			VerificationEmail({ username, otp: verifyCode })
+		);
+
+		const mailOptions = {
+			from: '"Anon" <no-reply@anon.dev>',
 			to: email,
 			subject: "Anon Verification Code",
-			react: VerificationEmail({ username, otp: verifyCode }),
-		});
+			html: emailHtml,
+		};
+
+		await transporter.sendMail(mailOptions);
+
 		return {
 			success: true,
 			message: "Verification email sent successfully.",
